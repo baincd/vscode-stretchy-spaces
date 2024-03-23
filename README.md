@@ -1,3 +1,12 @@
+# Stretchy Spaces (Chris' Version)
+
+Fork of Stretchy Spaces, with 3 fixes:
+
+- includedLanguages and excludedLanguages don't quite work
+- Spaces briefly appear between characters on a new line. (issue 4)
+- Inline diff editors don't work correctly
+
+
 # Stretchy Spaces
 
 Allows you to change how wide your indentation spaces are.
