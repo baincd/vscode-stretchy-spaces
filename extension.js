@@ -7,6 +7,7 @@ function activate(context) {
     let timeout = null;
     let enabled = true;
     let currentLanguageId = null;
+    let currentLanguageEnabled = false;
     let activeEditor = vscode.window.activeTextEditor;
 
     let currentIndentDecorationType;
@@ -57,22 +58,23 @@ function activate(context) {
     function checkLanguage() {
         if (activeEditor) {
             if (currentLanguageId !== activeEditor.document.languageId) {
+                currentLanguageEnabled = true
                 const inclang = vscode.workspace.getConfiguration('stretchySpaces').includedLanguages || [];
                 const exclang = vscode.workspace.getConfiguration('stretchySpaces').excludedLanguages || [];
                 currentLanguageId = activeEditor.document.languageId;
                 if (inclang.length !== 0) {
                     if (inclang.indexOf(currentLanguageId) === -1) {
-                        return false;
+                        currentLanguageEnabled = false;
                     }
                 }
                 if (exclang.length !== 0) {
                     if (exclang.indexOf(currentLanguageId) !== -1) {
-                        return false;
+                        currentLanguageEnabled = false;
                     }
                 }
             }
         }
-        return true;
+        return currentLanguageEnabled;
     }
 
     function clearDecorations() {
