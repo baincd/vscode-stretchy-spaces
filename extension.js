@@ -120,7 +120,8 @@ function activate(context) {
             // current + percentChange × current = target
             const percentChange = (targetIndentation - activeEditor.options.tabSize) / activeEditor.options.tabSize;
             currentIndentDecorationType = vscode.window.createTextEditorDecorationType({
-                letterSpacing: percentChange + 'ch' // https://css-tricks.com/the-lengths-of-css/#ch
+                letterSpacing: percentChange + 'ch', // https://css-tricks.com/the-lengths-of-css/#ch
+                rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
             });
         }
 
