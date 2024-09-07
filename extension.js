@@ -12,6 +12,18 @@ function activate(context) {
     let activeEditor = vscode.window.activeTextEditor;
 
     let currentIndentDecorationType;
+    const alignmentDecorationType = vscode.window.createTextEditorDecorationType({
+        before: {
+            contentText: "⇥",
+            color: "#7F7F7F7F",
+            fontWeight: 'bold',
+            // Move one character width left (but use width of 1ch to keep everything aligned)
+            margin: "0 0 0 -1ch",
+            width: "1ch",
+        },
+        rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
+    });
+
 
     let diffEditorSetting = {
         enabled: true,
@@ -152,6 +164,7 @@ function activate(context) {
     function clearDecorations() {
         if (activeEditor && currentIndentDecorationType) {
             activeEditor.setDecorations(currentIndentDecorationType, []);
+            activeEditor.setDecorations(alignmentDecorationType, []);
             currentIndentDecorationType = null;
         }
     }
@@ -176,6 +189,7 @@ function activate(context) {
             return;
         }
         const decorationRanges = [];
+        const alignmentDecorationRanges = [];
         let regEx;
         if (vscode.workspace.getConfiguration('stretchySpaces').alignAsterisks) {
              // Spaces from the start of the line until before the space before a *,
@@ -203,11 +217,13 @@ function activate(context) {
         while (match = regEx.exec(text)) {
             const matchText = match[1];
             let indentationLength = matchText.length;
+            let alignmentDetected = false;
             if (alignmentDetection) {
                 if (indentationLength > currentIndentLength + (maxIndentationLevelIncrease * activeEditor.options.tabSize)) {
                     // If the indentation is more than that max increase allowed (from the previous indented line), 
                     // then alignment detected!  Use same indent length as before
                     indentationLength = currentIndentLength;
+                    alignmentDetected = true;
                 } else if (match[2]){
                     // If this is a line that has something other than all whitespace, then set the this indentation length as the current indent length
                     currentIndentLength = indentationLength;
@@ -216,16 +232,23 @@ function activate(context) {
             const startPos = activeEditor.document.positionAt(match.index);
             const endPos = activeEditor.document.positionAt(match.index + indentationLength);
             decorationRanges.push({ range: new vscode.Range(startPos, endPos), hoverMessage: null });
+            if (alignmentDetected && alignmentIndicator) {
+                alignmentDecorationRanges.push({ range: new vscode.Range(endPos, endPos), hoverMessage: null });
+            }
         }
         activeEditor.setDecorations(currentIndentDecorationType, decorationRanges);
+        activeEditor.setDecorations(alignmentDecorationType, alignmentDecorationRanges);
+
     }
 
     // alignment
     //   enabled
     //   maxIndentLevelIncrease
+    //   displayAlignmentStartIndicator
     
     let alignmentDetection = true;
-    let maxIndentationLevelIncrease = 1.1;
+    let maxIndentationLevelIncrease = 2;
+    let alignmentIndicator = true;
 }
 
 exports.activate = activate;
