@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 // this method is called when vs code is activated
+
 function activate(context) {
     // Create a decorator types that we use to decorate indent levels
     let timeout = null;
@@ -12,6 +13,13 @@ function activate(context) {
 
     let currentIndentDecorationType;
 
+    let diffEditorSetting = {
+        enabled: true,
+        inline: false,
+        sideBySideToggleFix: true
+    }
+
+    stretchySpacesDiffEditorConfigurationUpdated();
     if (activeEditor && checkLanguage()) {
         triggerUpdateDecorations();
     }
@@ -40,16 +48,11 @@ function activate(context) {
     }, null, context.subscriptions);
 
     vscode.workspace.onDidChangeConfiguration(function(event) {
-        if (event.affectsConfiguration('diffEditor') && enabled && activeEditor && isDiffEditor()) {
-            if (!isInlineDiffEditor()) {
-                triggerUpdateDecorations();
-            } else if (currentIndentDecorationType) {
-                clearDecorations();
-                // When switching from side-by-side to inline, clear decorations does not always work
-                // Hack-y workaround - create a new file and immediately close it forces the editor to refresh
-                vscode.commands.executeCommand("workbench.action.files.newUntitledFile")
-                    .then(vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
-            }
+        if (event.affectsConfiguration('diffEditor') && isDiffEditor() && enabled && activeEditor) {
+            diffEditorModeChanged();
+        } else if (event.affectsConfiguration('stretchySpaces.diffEditor')) {
+            stretchySpacesDiffEditorConfigurationUpdated();
+            triggerUpdateDecorations();
         }
     }, null, context.subscriptions);
 
@@ -68,6 +71,49 @@ function activate(context) {
             }
         }
     });
+
+    function diffEditorModeChanged() {
+        if (!diffEditorSetting.enabled) {
+            return;
+        }
+        if (isInlineDiffEditor() && diffEditorSetting.inline == false) {
+            clearDecorations();
+            if (diffEditorSetting.sideBySideToggleFix) {
+                // When switching from side-by-side to inline, clear decorations does not always work
+                // Hack-y workaround - create a new file and immediately close it forces the editor to refresh
+                vscode.commands.executeCommand("workbench.action.files.newUntitledFile")
+                    .then(vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+            }
+        } else {
+            triggerUpdateDecorations();
+        }
+    }
+
+    function stretchySpacesDiffEditorConfigurationUpdated() {
+        switch(vscode.workspace.getConfiguration('stretchySpaces').diffEditor) {
+            case "Always":
+                diffEditorSetting.enabled = true;
+                diffEditorSetting.inline = true;
+                diffEditorSetting.sideBySideToggleFix = false;
+                break;
+            case "Side-by-Side-Only":
+                diffEditorSetting.enabled = true;
+                diffEditorSetting.inline = false;
+                diffEditorSetting.sideBySideToggleFix = false;
+                break;
+            case "Side-by-Side-Only-With-Toggle-Fix":
+                diffEditorSetting.enabled = true;
+                diffEditorSetting.inline = false;
+                diffEditorSetting.sideBySideToggleFix = true;
+                break;
+            case "Never":
+            default:
+                diffEditorSetting.enabled = false;
+                diffEditorSetting.inline = false;
+                diffEditorSetting.sideBySideToggleFix = false;
+                break;
+        }
+    }
 
     function isInlineDiffEditor() {
         return isDiffEditor()
@@ -122,7 +168,7 @@ function activate(context) {
     }
 
     function updateDecorations() {
-        if (!activeEditor || isInlineDiffEditor() || !enabled) {
+        if (!activeEditor || (!diffEditorSetting.enabled && isDiffEditor()) || (!diffEditorSetting.inline && isInlineDiffEditor()) || !enabled) {
             return;
         }
         const targetIndentation = vscode.workspace.getConfiguration('stretchySpaces').targetIndentation;

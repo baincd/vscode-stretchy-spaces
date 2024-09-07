@@ -45,7 +45,25 @@
                     "type": "integer",
                     "default": 100,
                     "description": "The delay in ms until the editor gets updated."
+                },
+                "stretchySpaces.diffEditor": {
+                    "type": "string",
+                    "default": "Side-by-Side-Only-With-Toggle-Fix",
+                    "enum": [
+                        "Never",
+                        "Always",
+                        "Side-by-Side-Only",
+                        "Side-by-Side-Only-With-Toggle-Fix"
+                    ],
+                    "enumDescriptions": [
+                        "Never enabled for diff editors",
+                        "Always enabled for diff editors",
+                        "Only enabled for diff editors when in side-by-side mode",
+                        "Only enabled for diff editors when in side-by-side mode - includes a hack-y fix for when toggling between side-by-side and inline modes"
+                    ],
+                    "description": "When Stretchy Spaces should be enabled in diff editors"
                 }
+
             }
         },
         "commands": [
