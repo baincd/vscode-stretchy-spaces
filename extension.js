@@ -180,9 +180,9 @@ function activate(context) {
         if (vscode.workspace.getConfiguration('stretchySpaces').alignAsterisks) {
              // Spaces from the start of the line until before the space before a *,
              // to preserve JSDoc-style comments alignment
-            regEx = /^( +)(?!\*)/gm;
+            regEx = /^( +)(?!\*)(\S)?/gm;
         } else {
-            regEx = /^( +)/gm;
+            regEx = /^( +)(\S)?/gm;
         }
         const text = activeEditor.document.getText();
 
@@ -198,16 +198,34 @@ function activate(context) {
         }
 
         let match;
-
+        let currentIndentLength = 0;
+        
         while (match = regEx.exec(text)) {
             const matchText = match[1];
-            const matchLength = matchText.length;
+            let indentationLength = matchText.length;
+            if (alignmentDetection) {
+                if (indentationLength > currentIndentLength + (maxIndentationLevelIncrease * activeEditor.options.tabSize)) {
+                    // If the indentation is more than that max increase allowed (from the previous indented line), 
+                    // then alignment detected!  Use same indent length as before
+                    indentationLength = currentIndentLength;
+                } else if (match[2]){
+                    // If this is a line that has something other than all whitespace, then set the this indentation length as the current indent length
+                    currentIndentLength = indentationLength;
+                }
+            }
             const startPos = activeEditor.document.positionAt(match.index);
-            const endPos = activeEditor.document.positionAt(match.index + matchLength);
+            const endPos = activeEditor.document.positionAt(match.index + indentationLength);
             decorationRanges.push({ range: new vscode.Range(startPos, endPos), hoverMessage: null });
         }
         activeEditor.setDecorations(currentIndentDecorationType, decorationRanges);
     }
+
+    // alignment
+    //   enabled
+    //   maxIndentLevelIncrease
+    
+    let alignmentDetection = true;
+    let maxIndentationLevelIncrease = 1.1;
 }
 
 exports.activate = activate;
