@@ -180,9 +180,9 @@ function activate(context) {
         if (vscode.workspace.getConfiguration('stretchySpaces').alignAsterisks) {
              // Spaces from the start of the line until before the space before a *,
              // to preserve JSDoc-style comments alignment
-            regEx = /^ +(?!\*)/gm;
+            regEx = /^( +)(?!\*)/gm;
         } else {
-            regEx = /^ +/gm;
+            regEx = /^( +)/gm;
         }
         const text = activeEditor.document.getText();
 
@@ -200,7 +200,7 @@ function activate(context) {
         let match;
 
         while (match = regEx.exec(text)) {
-            const matchText = match[0];
+            const matchText = match[1];
             const matchLength = matchText.length;
             const startPos = activeEditor.document.positionAt(match.index);
             const endPos = activeEditor.document.positionAt(match.index + matchLength);
