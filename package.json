@@ -1,13 +1,20 @@
 {
-    "name": "stretchy-spaces",
+    "name": "stretchy-spaces-baincd",
     "displayName": "stretchy-spaces (Chris' Version)",
     "description": "Allows you to change how wide your indentation spaces are.",
-    "version": "0.1.0+baincd3",
+    "version": "0.2.0",
     "publisher": "baincd",
+    "author": {
+        "name": "Chris Bain" 
+    },
     "icon": "icon.png",
     "license": "MIT",
     "engines": {
         "vscode": "^1.11.0"
+    },
+    "repository": {
+        "url": "https://github.com/baincd/vscode-stretchy-spaces.git",
+        "type": "git"
     },
     "categories": [
         "Other"
