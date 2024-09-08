@@ -17,9 +17,10 @@
     ],
     "main": "./extension",
     "contributes": {
-        "configuration": {
+        "configuration":
+        [{
             "type": "object",
-            "title": "Stretchy-Spaces configuration",
+            "order": 0,
             "properties": {
                 "stretchySpaces.targetIndentation": {
                     "type": "number",
@@ -63,9 +64,32 @@
                     ],
                     "description": "When Stretchy Spaces should be enabled in diff editors"
                 }
-
             }
         },
+        {
+            "title": "Alignment Detection",
+            "order": 1,
+            "properties": {
+                "stretchySpaces.alignmentDetection.enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Detect indentation vs alignment (based on increase in leading spaces compared to previous indentation level), and only stretch the indentation spaces",
+                    "order": 0
+                },
+                "stretchySpaces.alignmentDetection.maxIndentationLevelIncrease": {
+                    "type": "number",
+                    "default": 1,
+                    "markdownDescription": "Determines the threshold of additional leading spaces ({maxIndentationLevelIncrease}×{Editor Tab Size}) to be considered an increase in indentation.\n\nIf the number of additional leading spaces from the previous indented line is more than that threshold, the additional leading spaces will be considered for alignment and will NOT be stretched.",
+                    "order": 1
+                },
+                "stretchySpaces.alignmentDetection.displayIndicator": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When leading spaces for alignment are detected, display an indicator in the editor where the stretched spaces stop",
+                    "order": 2
+                }
+            }
+        }],
         "commands": [
             {
                 "command": "stretchySpaces.disable",

@@ -211,6 +211,8 @@ function activate(context) {
             });
         }
 
+        const alignmentDetectionSettings = vscode.workspace.getConfiguration('stretchySpaces').alignmentDetection;
+
         let match;
         let currentIndentLength = 0;
         
@@ -218,8 +220,8 @@ function activate(context) {
             const matchText = match[1];
             let indentationLength = matchText.length;
             let alignmentDetected = false;
-            if (alignmentDetection) {
-                if (indentationLength > currentIndentLength + (maxIndentationLevelIncrease * activeEditor.options.tabSize)) {
+            if (alignmentDetectionSettings.enabled) {
+                if (indentationLength > currentIndentLength + (alignmentDetectionSettings.maxIndentationLevelIncrease * activeEditor.options.tabSize)) {
                     // If the indentation is more than that max increase allowed (from the previous indented line), 
                     // then alignment detected!  Use same indent length as before
                     indentationLength = currentIndentLength;
@@ -232,7 +234,7 @@ function activate(context) {
             const startPos = activeEditor.document.positionAt(match.index);
             const endPos = activeEditor.document.positionAt(match.index + indentationLength);
             decorationRanges.push({ range: new vscode.Range(startPos, endPos), hoverMessage: null });
-            if (alignmentDetected && alignmentIndicator) {
+            if (alignmentDetected && alignmentDetectionSettings.displayIndicator) {
                 alignmentDecorationRanges.push({ range: new vscode.Range(endPos, endPos), hoverMessage: null });
             }
         }
@@ -241,14 +243,6 @@ function activate(context) {
 
     }
 
-    // alignment
-    //   enabled
-    //   maxIndentLevelIncrease
-    //   displayAlignmentStartIndicator
-    
-    let alignmentDetection = true;
-    let maxIndentationLevelIncrease = 2;
-    let alignmentIndicator = true;
 }
 
 exports.activate = activate;
