@@ -1,17 +1,10 @@
 # Stretchy Spaces (Chris' Version)
 
-Fork of Stretchy Spaces, with 3 fixes:
-
-- includedLanguages and excludedLanguages don't quite work
-- Spaces briefly appear between characters on a new line. (issue 4)
-- Inline diff editors don't work correctly
-
-
-# Stretchy Spaces
-
 Allows you to change how wide your indentation spaces are.
 
 ![Example](https://raw.githubusercontent.com/kylepaulsen/vscode-stretchy-spaces/master/pic.png)
+
+This is a fork of [Stretchy Spaces (kylepaulsen.stretchy-spaces)](https://marketplace.visualstudio.com/items?itemName=kylepaulsen.stretchy-spaces) with [changes](#stretchy-spaces-chris-version-changes).
 
 ## Features
 
@@ -19,6 +12,7 @@ Do you hate your project's indentation level and have a hard time reading your c
 stretch it to be what you want! You can expand or contract your indentation using this extension.
 
 Note: This only works on files that are indented using spaces. If a file is indented using tabs, vscode can already change your tab size! It's built into the editor!
+
 
 ## Configuration
 
@@ -66,3 +60,23 @@ Or install the [Guides](https://marketplace.visualstudio.com/itemdetails?itemNam
 This extension borrows code from the [Indent Rainbow](https://github.com/oderwat/vscode-indent-rainbow) extension, which I highly recommend!
 
 Licensed under MIT
+
+---
+
+# Stretchy Spaces (Chris' Version) Changes
+
+## Fixes
+- Fixed includedLanguages and excludedLanguages settings behavior
+- Fixed spaces briefly appearing between characters on new lines (issue 4)
+- In diff editor, only enable in side-by-side mode
+  - Extension does not work correctly in inline mode due to VS Code limitations
+  - Setting `stretchySpaces.diffEditor` can be used to configure extension functionality in diff editors
+
+## Enhancements
+- [Alignment Detection](./AlignmentDetection.md)
+
+## Thank You!
+
+A sincere thank you to [Kyle Paulsen](https://github.com/kylepaulsen) for originally creating [Stretchy Spaces](https://github.com/kylepaulsen/vscode-stretchy-spaces).
+
+ 
