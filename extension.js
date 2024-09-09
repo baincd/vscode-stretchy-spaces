@@ -23,6 +23,17 @@ function activate(context) {
         },
         rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     });
+    const posZeroAlignmentDecorationType = vscode.window.createTextEditorDecorationType({
+        before: {
+            contentText: "⇥",
+            color: "#7F7F7F7F",
+            fontWeight: 'bold',
+            // Move one character width left (but use width of 1ch to keep everything aligned)
+            margin: "0 0 0 0",
+            width: "0",
+        },
+        rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
+    });
 
 
     let diffEditorSetting = {
@@ -165,6 +176,7 @@ function activate(context) {
         if (activeEditor && currentIndentDecorationType) {
             activeEditor.setDecorations(currentIndentDecorationType, []);
             activeEditor.setDecorations(alignmentDecorationType, []);
+            activeEditor.setDecorations(posZeroAlignmentDecorationType, []);
             currentIndentDecorationType = null;
         }
     }
@@ -190,6 +202,7 @@ function activate(context) {
         }
         const decorationRanges = [];
         const alignmentDecorationRanges = [];
+        const posZeroAlignmentDecorationRanges = [];
         let regEx;
         if (vscode.workspace.getConfiguration('stretchySpaces').alignAsterisks) {
             // Spaces from the start of the line until before the space before a *,
@@ -231,15 +244,23 @@ function activate(context) {
                     currentIndentLength = indentationLength;
                 }
             }
-            const startPos = new vscode.Position(lineIdx,0);
-            const endPos = new vscode.Position(lineIdx, indentationLength);
-            decorationRanges.push({ range: new vscode.Range(startPos, endPos), hoverMessage: null });
-            if (alignmentDetected && alignmentDetectionSettings.displayIndicator) {
-                alignmentDecorationRanges.push({ range: new vscode.Range(endPos, endPos), hoverMessage: null });
+            if (indentationLength) {
+                const startPos = new vscode.Position(lineIdx,0);
+                const endPos = new vscode.Position(lineIdx, indentationLength);
+                decorationRanges.push({ range: new vscode.Range(startPos, endPos), hoverMessage: null });
+                if (alignmentDetected && alignmentDetectionSettings.displayIndicator) {
+                    alignmentDecorationRanges.push({ range: new vscode.Range(endPos, endPos), hoverMessage: null });
+                }
+            } else {
+                if (alignmentDetected && alignmentDetectionSettings.displayIndicator) {
+                    const endPos = new vscode.Position(lineIdx, indentationLength);
+                    posZeroAlignmentDecorationRanges.push({ range: new vscode.Range(endPos, endPos), hoverMessage: null });
+                }
             }
         }
         activeEditor.setDecorations(currentIndentDecorationType, decorationRanges);
         activeEditor.setDecorations(alignmentDecorationType, alignmentDecorationRanges);
+        activeEditor.setDecorations(posZeroAlignmentDecorationType, posZeroAlignmentDecorationRanges);
 
     }
 
