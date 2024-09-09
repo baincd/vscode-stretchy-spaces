@@ -94,6 +94,12 @@
                     "default": true,
                     "description": "When leading spaces for alignment are detected, display an indicator in the editor where the stretched spaces stop",
                     "order": 2
+                },
+                "stretchySpaces.alignmentDetection.nonIndentationLevelSettingLineRegEx": {
+                    "type": "string",
+                    "default": "^ *(//|/\\*| \\*|\\*/|;|#|<!--|-->)",
+                    "description": "Lines that match this regex will not change the current indentation level used for determining indentation vs alignment.  This is useful for comments and other lines that may not match the current indentation level and would otherwise cause the alignment detection to not work as expected.",
+                    "order": 3
                 }
             }
         }],

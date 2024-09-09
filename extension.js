@@ -225,6 +225,7 @@ function activate(context) {
         }
 
         const alignmentDetectionSettings = vscode.workspace.getConfiguration('stretchySpaces').alignmentDetection;
+        const nonIndentationLevelSettingLineRegEx = new RegExp(alignmentDetectionSettings.nonIndentationLevelSettingLineRegEx || '^(?!a)a$');
 
         let currentIndentLength = 0;
         
@@ -239,8 +240,9 @@ function activate(context) {
                     // then alignment detected!  Use same indent length as before
                     indentationLength = currentIndentLength;
                     alignmentDetected = true;
-                } else if (match[2]){
-                    // If this is a line that has something other than all whitespace, then set the this indentation length as the current indent length
+                } else if (match[2] && !nonIndentationLevelSettingLineRegEx.test(match[0])){
+                    // If this is a line that has something other than all whitespace AND is not a non-indentation-level-setting-line (like a comment), 
+                    // then set the this indentation length as the current indent length
                     currentIndentLength = indentationLength;
                 }
             }
