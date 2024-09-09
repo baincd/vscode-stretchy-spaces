@@ -192,11 +192,11 @@ function activate(context) {
         const alignmentDecorationRanges = [];
         let regEx;
         if (vscode.workspace.getConfiguration('stretchySpaces').alignAsterisks) {
-             // Spaces from the start of the line until before the space before a *,
-             // to preserve JSDoc-style comments alignment
-            regEx = /^( +)(?!\*)(\S)?/gm;
+            // Spaces from the start of the line until before the space before a *,
+            // to preserve JSDoc-style comments alignment
+            regEx = /^( +)?(?!\*)(\S+)?/;
         } else {
-            regEx = /^( +)(\S)?/gm;
+            regEx = /^( +)?(\S+)?/;
         }
         const text = activeEditor.document.getText();
 
@@ -213,11 +213,11 @@ function activate(context) {
 
         const alignmentDetectionSettings = vscode.workspace.getConfiguration('stretchySpaces').alignmentDetection;
 
-        let match;
         let currentIndentLength = 0;
         
-        while (match = regEx.exec(text)) {
-            const matchText = match[1];
+        for (let lineIdx = 0; lineIdx < activeEditor.document.lineCount; lineIdx++) {
+            const match = regEx.exec(activeEditor.document.lineAt(lineIdx).text);
+            const matchText = match[1] || '';
             let indentationLength = matchText.length;
             let alignmentDetected = false;
             if (alignmentDetectionSettings.enabled) {
@@ -231,8 +231,8 @@ function activate(context) {
                     currentIndentLength = indentationLength;
                 }
             }
-            const startPos = activeEditor.document.positionAt(match.index);
-            const endPos = activeEditor.document.positionAt(match.index + indentationLength);
+            const startPos = new vscode.Position(lineIdx,0);
+            const endPos = new vscode.Position(lineIdx, indentationLength);
             decorationRanges.push({ range: new vscode.Range(startPos, endPos), hoverMessage: null });
             if (alignmentDetected && alignmentDetectionSettings.displayIndicator) {
                 alignmentDecorationRanges.push({ range: new vscode.Range(endPos, endPos), hoverMessage: null });
